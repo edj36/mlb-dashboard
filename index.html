@@ -1,0 +1,111 @@
+<h1>Today's Scores</h1>
+
+<script>
+function updateTodaysGame(resp) {
+	var json = JSON.parse(resp);
+	var game_array = json.data.games.game
+	for (i=0;i<game_array.length;i++) {
+		console.log(game_array[i])
+		var hruns = game_array[i].home_team_runs;
+		var aruns = game_array[i].away_team_runs;
+		var inning = game_array[i].inning;
+		var outs = game_array[i].outs;
+		var status = game_array[i]["status"];
+
+		if (hruns == undefined) {hruns = 0;}
+		if (aruns == undefined) {aruns = 0;}
+		if (inning == undefined) {inning = 0;}
+		if (outs == undefined) {outs = 0;}
+		if (status == undefined) {status = "";}
+
+		var newHTML = document.createElement('div');
+		newHTML.innerHTML = '\
+		  <div style="border: 1px solid black;"> \
+    	    <h3>Home: '+ game_array[i].home_team_name +'</h3>  \
+        	<p>Score: '+ hruns +'</p>   \
+    		<h3>Away: '+ game_array[i].away_team_name +'</h3>  \
+        	<p>Score: '+ aruns +'</p>   \
+        	<p>Inning: '+ inning +', Outs: ' + outs +', '+ status + '</p>   \
+    	  </div>         ';
+
+		document.body.appendChild(newHTML);
+		
+	}
+}
+
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
+var team_id = "138";
+
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth()+1; //January is 0!
+var yyyy = today.getFullYear();
+
+if(dd<10) {
+    dd='0'+dd
+} 
+
+if(mm<10) {
+    mm='0'+mm
+} 
+
+httpGetAsync("http://mlb.mlb.com/gdcross/components/game/mlb/year_" + yyyy + "/month_" + mm + "/day_" + dd + "/miniscoreboard.json", updateTodaysGame)
+
+
+</script>
+
+<!--
+Team: 
+NL East
+  Mets: 121
+  Nationals: 120
+  Braves: 144
+  Phillies: 143
+  Marlins: 146
+
+NL Central
+  Cardinals: 138
+  Cubs: 112
+  Brewers: 158
+  Reds: 113
+  Pirates: 134
+
+NL West
+  Dodgers: 119
+  Giants: 137
+  Padres: 135
+  D-backs: 109
+  Rockies: 115
+
+AL East
+  Yankees: 147
+  Orioles: 110
+  Rays: 139
+  Blue Jays: 141
+  Red Sox: 111
+
+AL Central
+  Twins: 142
+  Indians: 114
+  Tigers: 116
+  White Sox: 145
+  Royals: 118
+
+AL West
+  Angels: 108
+  Athletics: 133
+  Astros: 117
+  Rangers: 140
+  Mariners: 136
+
+-->
