@@ -1,4 +1,4 @@
-<h1>Today's Scores</h1>
+<h1 id="today">Today's Scores</h1>
 
 <script>
 function updateTodaysGame(resp) {
@@ -51,14 +51,9 @@ var dd = today.getDate();
 var mm = today.getMonth()+1; //January is 0!
 var yyyy = today.getFullYear();
 
-if(dd<10) {
-    dd='0'+dd
-} 
-
-if(mm<10) {
-    mm='0'+mm
-} 
-
+if(dd<10) { dd='0'+dd; }
+if(mm<10) { mm='0'+mm; } 
+document.getElementById("today").innerHTML = mm+'/'+dd+'/'+yyyy+' Scores';
 httpGetAsync("http://mlb.mlb.com/gdcross/components/game/mlb/year_" + yyyy + "/month_" + mm + "/day_" + dd + "/miniscoreboard.json", updateTodaysGame)
 
 
