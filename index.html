@@ -7,6 +7,17 @@
     <title>MLB Dashboard</title>
     
     <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-80419417-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
     
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/grids-responsive-old-ie-min.css">
@@ -41,7 +52,7 @@
 </div> <!-- end l-content -->
 
 <script>
-
+// https://purecss.io/grids/
 // need a response handler for a "yesterday button" response
 // should subtract one from the today variable stored (deal with months)
 // and then reload the page with data from the previous day
@@ -110,7 +121,10 @@ if(mm<10) { mm='0'+mm; }
 document.getElementById("today").innerHTML = mm+'/'+dd+'/'+yyyy+' Scores';
 httpGetAsync("http://mlb.mlb.com/gdcross/components/game/mlb/year_" + yyyy + "/month_" + mm + "/day_" + dd + "/miniscoreboard.json", updateTodaysGame)
 
-
+/*
+ Alternate URL:
+ http://gd2.mlb.com/components/game/mlb/year_2012/month_05/day_15/master_scoreboard.json
+ */
 </script>
 
 
