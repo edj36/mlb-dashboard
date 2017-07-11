@@ -60,6 +60,9 @@
 // date in the top left (i guess)
 // need to make sure all output is cleared before populating any div with game information
 
+// may need to add some kind of functionality to support what happens
+// on a day where there are no games
+
 function updateTodaysGame(resp) {
   var json = JSON.parse(resp);
   var game_array = json.data.games.game

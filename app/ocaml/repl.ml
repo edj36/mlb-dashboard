@@ -1,4 +1,11 @@
-type verb = Go | Take | Drop | Look | Inventory | Score | Turns | Stop
+open Game
+open Cohttp
+open Cohttp_lwt_unix
+open Lwt
+open Yojson.Basic.Util
+open Unix
+
+type verb = Help| Scores | Stop
 
 type command = {
   verb : verb;
@@ -20,13 +27,8 @@ open Yojson.Basic.Util
 
 (* [to_verb str] is the verb type represented by the [str] *)
 let to_verb = function
-  | "go" -> Go
-  | "take" -> Take
-  | "drop" -> Drop
-  | "look" -> Look
-  | "inv" | "inventory" -> Inventory
-  | "score" -> Score
-  | "turns" -> Turns
+  | "help" -> Help
+  | "score" -> Scores
   | "quit" -> Stop
   | _ -> raise (Illegal)
 
@@ -40,60 +42,37 @@ let to_command com =
       let int_snd_length = (String.length str_com) - int_index in
       let str_snd = String.sub str_com (int_index + 1) (int_snd_length - 1) in
         { verb = to_verb str_fst; obj = str_snd }
-    else if str_com = "north" then
-      { verb = to_verb "go"; obj = "north" }
-    else if str_com = "south" then
-      { verb = to_verb "go"; obj = "south" }
-    else if str_com = "east" then
-      { verb = to_verb "go"; obj = "east" }
-    else if str_com = "west" then
-      { verb = to_verb "go"; obj = "west" }
-    else if str_com = "up" then
-      { verb = to_verb "go"; obj = "up" }
-    else if str_com = "down" then
-      { verb = to_verb "go"; obj = "down" }
     else
       { verb = to_verb str_com; obj = "" }
 
-(* [quit_action] raises a quit exception, ending the game *)
-let quit_action c = 
+(* [help_action com] is the unit type resulting from displaying 
+ * help information to the user *)
+let help_action com = 
+  print_endline "type help for help, score <team-name> for team score and quit to quit"
+
+(* [scores_action com] is the unit type resulting from running 
+ * the [get_todays_game] function in game.ml on command [com]
+ * to get and print today's baseball scores *)
+let scores_action com = 
+  let today_score = Lwt_main.run (get_todays_game com.obj) in
+    print_endline (today_score)
+
+(* [quit_action com] raises a quit exception, ending the game *)
+let quit_action com = 
   raise (Quit)
 
-let go_action g = print_endline g
-
-(* [do' c st] is [st'] if it is possible to do command [c] in
- * state [st] and the resulting new state would be [st'].  The
- * function name [do'] is used because [do] is a reserved keyword.
- *   - The "go" (and its shortcuts), "take" and "drop" commands
- *     either result in a new state, or are not possible because
- *     their object is not valid in state [st] hence they raise [Illegal].
- *       + the object of "go" is valid if it is a direction by which
- *         the current room may be exited
- *       + the object of "take" is valid if it is an item in the
- *         current room
- *       + the object of "drop" is valid if it is an item in the
- *         current inventory
- *       + if no object is provided (i.e., the command is simply
- *         the bare word "go", "take", or "drop") the behavior
- *         is unspecified
- *   - The "quit", "look", "inventory", "inv", "score", and "turns"
- *     commands are always possible and leave the state unchanged.
- *   - The behavior of [do'] is unspecified if the command is
- *     not one of the commands given in the assignment writeup.
- * The underspecification above is in order to enable karma
- * implementations that provide new commands. *)
-let process c =
-  let com = to_command c in
+(* [process c] is the unit type resulting from processing a command *)
+let process c = 
+  let com = to_command c in 
   match com.verb with
-  | Go -> go_action c
-  | Stop -> quit_action c
-  | _ -> print_endline c
+  | Help -> help_action com
+  | Scores -> scores_action com
+  | Stop -> quit_action com
 
 (* [repl st] is a unit value that acts as the looping mechanism
  * in the Read Eval Print Loop of the terminal. Uses user input to 
- * execute a command and create a new state,
- * then calls itself again on that state. Exception handling
- * is also implemented, in the case that a user quits the game,
+ * execute a command and then calls itself again on that state. 
+ * Exception handling is also implemented, in the case that a user quits,
  * or another exception is thrown. *)
 let rec repl s =
   try
@@ -109,7 +88,7 @@ let rec repl s =
 let () =
   ANSITerminal.(print_string [red] 
     "\n\nWelcome to MLB terminal.\n");
-  print_endline "What's your name?\n";
+  print_endline "What's your name?";
   print_string  "> ";
   let name = read_line () in
   	let _ = print_endline ("Hello " ^ name) in 

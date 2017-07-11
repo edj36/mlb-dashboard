@@ -13,4 +13,4 @@ backend:
 # 	cohttp-server-async
 
 repl:
-	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal repl.byte && ./repl.byte
+	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal,unix,yojson,cohttp.lwt repl.native && ./repl.native
